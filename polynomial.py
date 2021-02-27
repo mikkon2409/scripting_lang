@@ -37,4 +37,31 @@ class Polynomial:
         return representation
 
     def __add__(self, other):
+        coeffs = self.coeffs.copy()
+        if type(other) == int:
+            coeffs[len(coeffs) - 1] += other
+        elif type(other) == type(self):
+            other_coeffs = other.coeffs.copy()
+            other_coeffs.reverse()
+            coeffs.reverse()
+            if len(coeffs) < len(other_coeffs):
+                for _ in range(len(other_coeffs) - len(coeffs)):
+                    coeffs.append(0)
+            for i in range(len(other_coeffs)):
+                coeffs[i] += other_coeffs[i]
+            coeffs.reverse()
+        else:
+            raise TypeError
+        return self.__class__(coeffs)
 
+    def __neg__(self):
+        return self.__class__([-x for x in self.coeffs])
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        return self.__add__(-other)
+
+    def __rsub__(self, other):
+        return self.__neg__().__add__(other)
