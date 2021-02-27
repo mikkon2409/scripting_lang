@@ -1,10 +1,12 @@
-from Polynomial import Polynomial
+from polynomial import Polynomial
 
 
 def main():
-    p = Polynomial(5)
-    p = Polynomial([5])
+    l = [-5, 0, 0]
+    p = Polynomial(l)
     print(p.coeffs)
+    print(repr(p))
+    print(p)
 
 
 if __name__ == "__main__":
