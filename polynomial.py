@@ -65,3 +65,34 @@ class Polynomial:
 
     def __rsub__(self, other):
         return self.__neg__().__add__(other)
+
+    def __mul__(self, other):
+        raise NotImplementedError
+        coeffs = self.coeffs.copy
+        if type(other) == int:
+            res_coeffs = [other * x for x in coeffs]
+        elif type(other) == type(self):
+            other_coeffs = other.coeffs.copy()
+            other_coeffs.reverse()
+            coeffs.reverse()
+            if len(coeffs) < len(other_coeffs):
+                for _ in range(len(other_coeffs) - len(coeffs)):
+                    coeffs.append(0)
+            for i in range(len(other_coeffs)):
+                coeffs[i] += other_coeffs[i]
+            coeffs.reverse()
+        else:
+            raise TypeError
+        return self.__class__(res_coeffs)
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __eq__(self, other):
+        if type(other) == int:
+            tmp_coeffs = [other]
+        elif type(other) == type(self):
+            tmp_coeffs = other.coeffs
+        else:
+            raise TypeError
+        return self.coeffs == tmp_coeffs
