@@ -15,7 +15,14 @@ class Polynomial:
         if type(coeffs) == int:
             self.coeffs = [coeffs]
         else:
-            self.coeffs = coeffs.copy()
+            self.coeffs = list(coeffs).copy()
+        first_non_zero = 0
+        for i in range(len(self.coeffs)):
+            if self.coeffs[i] != 0:
+                first_non_zero = i
+                break
+
+        del self.coeffs[:first_non_zero]
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.coeffs})'
@@ -67,20 +74,30 @@ class Polynomial:
         return self.__neg__().__add__(other)
 
     def __mul__(self, other):
-        raise NotImplementedError
-        coeffs = self.coeffs.copy
+        coeffs = self.coeffs.copy()
         if type(other) == int:
             res_coeffs = [other * x for x in coeffs]
         elif type(other) == type(self):
             other_coeffs = other.coeffs.copy()
             other_coeffs.reverse()
             coeffs.reverse()
+            len_diff = abs(len(coeffs) - len(other_coeffs))
+            zeros = [0 for _ in range(len_diff)]
             if len(coeffs) < len(other_coeffs):
-                for _ in range(len(other_coeffs) - len(coeffs)):
-                    coeffs.append(0)
-            for i in range(len(other_coeffs)):
-                coeffs[i] += other_coeffs[i]
-            coeffs.reverse()
+                coeffs.extend(zeros)
+            elif len(coeffs) > len(other_coeffs):
+                other_coeffs.extend(zeros)
+
+            res = {}
+            for i in range(len(coeffs)):
+                for j in range(len(other_coeffs)):
+                    power = i + j
+                    if power in res:
+                        res[power] += coeffs[i] * other_coeffs[j]
+                    else:
+                        res[power] = coeffs[i] * other_coeffs[j]
+            res_coeffs = sorted(res.items(), key=lambda x: x[0], reverse=True)
+            res_coeffs = [x[1] for x in res_coeffs]
         else:
             raise TypeError
         return self.__class__(res_coeffs)
@@ -96,3 +113,12 @@ class Polynomial:
         else:
             raise TypeError
         return self.coeffs == tmp_coeffs
+
+
+if __name__ == "__main__":
+    p1 = Polynomial([2, 3, 4])
+    p2 = Polynomial([3, 4, 5, 6])
+    p3 = p2
+    print(p3)
+    print(p1 * p2)
+    pass
