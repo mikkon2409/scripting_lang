@@ -1,8 +1,16 @@
 class Polynomial:
-    def __init__(self, *args):
-        if len(args) != 1:
-            raise TypeError
-        arg = args[0]
+    def _del_leading_zeros(self, my_list):
+        my_list_res = my_list.copy()
+        first_non_zero = 0
+        for i in range(len(my_list_res)):
+            if my_list_res[i] != 0:
+                first_non_zero = i
+                break
+
+        del my_list_res[:first_non_zero]
+        return my_list_res
+        
+    def __init__(self, arg):
         if type(arg) == type(self):
             self.coeffs = arg.coeffs.copy()
             return
@@ -16,13 +24,7 @@ class Polynomial:
             self.coeffs = [coeffs]
         else:
             self.coeffs = list(coeffs).copy()
-        first_non_zero = 0
-        for i in range(len(self.coeffs)):
-            if self.coeffs[i] != 0:
-                first_non_zero = i
-                break
-
-        del self.coeffs[:first_non_zero]
+        self.coeffs = self._del_leading_zeros(self.coeffs)
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.coeffs})'
@@ -114,11 +116,19 @@ class Polynomial:
             raise TypeError
         return self.coeffs == tmp_coeffs
 
+    def __getattr__(self, name):
+        if name == "coeffs":
+            return self.__dict__[name]
+        else:
+            raise AttributeError
 
-if __name__ == "__main__":
-    p1 = Polynomial([2, 3, 4])
-    p2 = Polynomial([3, 4, 5, 6])
-    p3 = p2
-    print(p3)
-    print(p1 * p2)
-    pass
+    def __setattr__(self, name, value):
+        if name == "coeffs":
+            if type(value) != list:
+                raise TypeError
+            if len(value) == 0:
+                raise ValueError
+            tmp_value = self._del_leading_zeros(value)
+            self.__dict__[name] = tmp_value
+        else:
+            raise AttributeError
